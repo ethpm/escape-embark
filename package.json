@@ -4,7 +4,8 @@
   "description": "Ethereum Package Registry (Embark)",
   "main": "Gruntfile.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "update:registry": "./scripts/upgrade_registry.sh"
   },
   "author": "",
   "license": "ISC",
