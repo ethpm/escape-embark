@@ -12,11 +12,11 @@ contract PackageDB is Authorized {
   using IndexedOrderedSetLib for IndexedOrderedSetLib.IndexedOrderedSet;
 
   struct Package {
-      bool exists;
-      uint createdAt;
-      uint updatedAt;
-      string name;
-      address owner;
+    bool exists;
+    uint createdAt;
+    uint updatedAt;
+    string name;
+    address owner;
   }
 
   // Package Data: (nameHash => value)
@@ -57,7 +57,7 @@ contract PackageDB is Authorized {
 
       // Set package data
       package.exists = true;
-      package.createdAt = now;
+      package.createdAt = block.timestamp;
       package.name = name;
 
       // Add the nameHash to the list of all package nameHashes.
@@ -66,17 +66,19 @@ contract PackageDB is Authorized {
       emit PackageCreate(nameHash);
     }
 
-    package.updatedAt = now;
+    package.updatedAt = block.timestamp;
 
     return true;
   }
 
   /// @dev Removes a package from the package db.  Packages with existing releases may not be removed.  Returns success.
   /// @param nameHash The name hash of a package.
-  function removePackage(bytes32 nameHash, string reason) public
-                                                          auth
-                                                          onlyIfPackageExists(nameHash)
-                                                          returns (bool) {
+  function removePackage(bytes32 nameHash, string reason)
+    public
+    auth
+    onlyIfPackageExists(nameHash)
+    returns (bool)
+  {
     emit PackageDelete(nameHash, reason);
 
     delete _recordedPackages[nameHash];
@@ -88,15 +90,16 @@ contract PackageDB is Authorized {
   /// @dev Sets the owner of a package to the provided address.  Returns success.
   /// @param nameHash The name hash of a package.
   /// @param newPackageOwner The address of the new owner.
-  function setPackageOwner(bytes32 nameHash,
-                           address newPackageOwner) public
-                                                    auth
-                                                    onlyIfPackageExists(nameHash)
-                                                    returns (bool) {
+  function setPackageOwner(bytes32 nameHash, address newPackageOwner)
+    public
+    auth
+    onlyIfPackageExists(nameHash)
+    returns (bool)
+  {
     emit PackageOwnerUpdate(nameHash, _recordedPackages[nameHash].owner, newPackageOwner);
 
     _recordedPackages[nameHash].owner = newPackageOwner;
-    _recordedPackages[nameHash].updatedAt = now;
+    _recordedPackages[nameHash].updatedAt = block.timestamp;
 
     return true;
   }
@@ -126,22 +129,28 @@ contract PackageDB is Authorized {
 
   /// @dev Returns information about the package.
   /// @param nameHash The name hash to look up.
-  function getPackageData(bytes32 nameHash) public
-                                            view
-                                            onlyIfPackageExists(nameHash)
-                                            returns (address packageOwner,
-                                                     uint createdAt,
-                                                     uint updatedAt) {
+  function getPackageData(bytes32 nameHash)
+    public
+    view
+    onlyIfPackageExists(nameHash)
+    returns (
+      address packageOwner,
+      uint createdAt,
+      uint updatedAt
+    )
+  {
     Package storage package = _recordedPackages[nameHash];
     return (package.owner, package.createdAt, package.updatedAt);
   }
 
   /// @dev Returns the package name for the given namehash
   /// @param nameHash The name hash to look up.
-  function getPackageName(bytes32 nameHash) public
-                                            view
-                                            onlyIfPackageExists(nameHash)
-                                            returns (string) {
+  function getPackageName(bytes32 nameHash)
+    public
+    view
+    onlyIfPackageExists(nameHash)
+    returns (string)
+  {
     return _recordedPackages[nameHash].name;
   }
 

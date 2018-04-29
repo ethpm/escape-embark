@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-git submodule update
+git submodule update --remote
 cp -r registry/contracts/. app/contracts
